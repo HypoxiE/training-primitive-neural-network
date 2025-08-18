@@ -14,6 +14,9 @@ class Node:
 		name = f"{self.label}:" if self.label else ""
 		return f"<{name}{self.op or 'var'} val={self.val:.6g} grad={self.grad:.6g}>"
 	
+	def __float__(self):
+		return self.val
+	
 	@staticmethod
 	def _to_node(x):
 		return x if isinstance(x, Node) else Node(x)
@@ -63,12 +66,22 @@ class Node:
 	
 	def __rtruediv__(self, other): return Node._to_node(other) / self
 
-	def __pow__(self, other):
+	def pow_with_node(self, other):
 		other = Node._to_node(other)
+		if self.val <= 0:
+			raise ValueError("base must be > 0 for real-valued power")
 		out = Node(self.val**other.val, parents=[(self, lambda g: g * other.val * (self.val ** (other.val-1))), (other, lambda g: g * (self.val ** other.val) * math.log(self.val))], op=f"**{other.val}")
 		def _backward():
 			self.grad += out.grad * other.val * (self.val ** (other.val-1))
 			other.grad += out.grad * (self.val ** other.val) * math.log(self.val)
+		out._backward = _backward
+		return out
+	
+	def __pow__(self, p: float):
+		# степень фиксируем скаляром p
+		out = Node(self.val**p, parents=[(self, lambda g: g * p * (self.val ** (p-1)))], op=f"**{p}")
+		def _backward():
+			self.grad += out.grad * p * (self.val ** (p-1))
 		out._backward = _backward
 		return out
 	
@@ -113,14 +126,12 @@ def backward(loss: Node):
 				build(p)
 			topo.append(u)
 	build(loss)
-	print(topo, list(reversed(topo)), visited)
 	# 2) инициализируем dL/dL = 1 и идём в обратном порядке
 	for n in topo:
 		n.grad = 0.0
 	loss.grad = 1.0
 	for node in reversed(topo):
 		node._backward()
-		print(node)
 
 if __name__ == "__main__":
 
