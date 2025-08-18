@@ -47,7 +47,7 @@ class SimpleNN:
 		# self.w2_out = auto_diff.Node(random.uniform(-1, 1))
 		# self.b_out = auto_diff.Node(random.uniform(-1, 1))
 
-		self.network = classes.NeuronNetwork(4, 2, 2)
+		self.network = classes.NeuronNetwork(4, 1, 2)
 
 		self.lr = 0.1   # скорость обучения
 

@@ -4,7 +4,7 @@ import visual
 import neuro_defs
 
 
-dataset = generate.generate_dataset(100)
+dataset = generate.generate_dataset(1000)
 
 
 # Создаём и обучаем сеть
