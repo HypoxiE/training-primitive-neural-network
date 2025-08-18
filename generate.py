@@ -1,7 +1,7 @@
 import classes
 
-def generate_dataset(N=1000):
-	return classes.DataSet(lambda x: 1*x-12, N)
+def generate_dataset(N=100):
+	return classes.DataSet(lambda x, y: float(((x**2 + y**2)**0.5)>=0.5), N)
 
 if __name__ == "__main__":
-	print([[i.train, i.train_answs] for i in [generate_dataset(10)]])
+	print(generate_dataset(10))

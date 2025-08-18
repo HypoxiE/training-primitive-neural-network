@@ -133,6 +133,9 @@ def backward(loss: Node):
 	for node in reversed(topo):
 		node._backward()
 
+def update_weights(weight: Node, lr: float):
+	return Node(float(weight) - lr * weight.grad)
+
 if __name__ == "__main__":
 
 	x = Node(2, label="x")
